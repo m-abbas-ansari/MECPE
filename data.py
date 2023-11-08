@@ -14,9 +14,9 @@ class MultiModalDataset(Dataset):
         self.y_causes_list, self.conv_len_list, self.conv_id_list \
         = self.read_data(data_pth)
     
-    self.vid_pth = vid_pth
-    self.aud_pth = aud_pth
-    self.txt_pth = txt_pth
+        self.vid_pth = vid_pth
+        self.aud_pth = aud_pth
+        self.txt_pth = txt_pth
 
     def __len__(self):
         return len(self.y_emotions_list)
