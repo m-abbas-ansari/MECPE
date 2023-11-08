@@ -84,9 +84,9 @@ def FeedForward(dim, mult = 4):
     )
 
 class Zorro_AVT(nn.Module):
-  """
-    modified from: https://github.com/lucidrains/zorro-pytorch/blob/main/zorro_pytorch/zorro_pytorch.py
-  """
+    """
+      modified from: https://github.com/lucidrains/zorro-pytorch/blob/main/zorro_pytorch/zorro_pytorch.py
+    """
     def __init__(
         self,
         dim,
@@ -95,14 +95,14 @@ class Zorro_AVT(nn.Module):
         heads = 8,
         ff_mult = 4,
         num_fusion_tokens = 8,
-        out_dim = 768
+        out_dim = 768,
         DEVICE = torch.device("cuda")
-    ):
+      ):
         super().__init__()
 
         # fusion tokens
         self.num_fusion_tokens = num_fusion_tokens
-        self.fusion_tokens = nn.Parameter(torch.randn(num_fusion_tokens, dim).to(DEVICE)
+        self.fusion_tokens = nn.Parameter(torch.randn(num_fusion_tokens, dim).to(DEVICE))
 
         self.fusion_mask = (torch.ones(num_fusion_tokens) == 1).to(DEVICE)
     
@@ -243,7 +243,7 @@ class GraphAttentionLayer(nn.Module):
     def __repr__(self):
         return self.__class__.__name__ + ' (' + str(self.in_dim) + ' -> ' + str(self.out_dim*self.att_head) + ')'
 
-  lass GraphNN(nn.Module):
+class GraphNN(nn.Module):
     def __init__(self, configs):
         super(GraphNN, self).__init__()
         in_dim = configs.feat_dim
