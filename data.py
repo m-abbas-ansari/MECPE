@@ -7,6 +7,7 @@ import scipy.sparse as sp
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import random_split, DataLoader
+import torch.nn.functional as F
 
 class MultiModalDataset(Dataset):
     def __init__(self, data_pth, vid_pth, aud_pth, txt_pth):
@@ -42,9 +43,9 @@ class MultiModalDataset(Dataset):
       for utt in utt_ids:
         id = 'dia'+str(conv_id)+'utt'+str(utt)+'.pkl'
 
-        v = torch.tensor(pickle.load(open(os.path.join(self.vid_path,id), "rb")), dtype=torch.float)
-        a = pickle.load(open(os.path.join(self.aud_path,id), "rb")).detach()
-        t = pickle.load(open(os.path.join(self.txt_path,id), "rb")).squeeze().detach()
+        v = torch.tensor(pickle.load(open(os.path.join(self.vid_pth,id), "rb")), dtype=torch.float)
+        a = pickle.load(open(os.path.join(self.aud_pth,id), "rb")).detach()
+        t = pickle.load(open(os.path.join(self.txt_pth,id), "rb")).squeeze().detach()
 
         videos.append(v); v_lens.append(len(v))
         audios.append(a); a_lens.append(len(a))
@@ -100,31 +101,24 @@ class MultiModalDataset(Dataset):
         return conv_utt_id_list, conv_couples_list, y_emotions_list, y_causes_list, conv_len_list, conv_id_list,
 
 
-def build_loaders(configs, 
-                  anno_pth, 
-                  vid_pth,
-                  aud_pth,
-                  txt_pth,
-                  seed=42,
-                  shuffle=True, 
-                  val_ratio=0.2,
-                  num_worker=2):
-    dataset = MultiModalDataset(anno_pth, vid_pth, aud_pth, txt_pth)
+def build_loaders(configs):
+    dataset = MultiModalDataset(configs.anno_pth, configs.vid_pth, 
+                                configs.aud_pth, configs.txt_pth)
 
-    gen = torch.Generator().manual_seed(seed)
-    train_dataset, val_dataset = random_split(dataset, [1-val_ratio, val_ratio], gen)
+    gen = torch.Generator().manual_seed(configs.seed)
+    train_dataset, val_dataset = random_split(dataset, [1-configs.val_ratio, configs.val_ratio], gen)
 
     train_loader = DataLoader(dataset=train_dataset, 
                              batch_size=configs.batch_size,
-                             shuffle=shuffle, 
+                             shuffle=configs.shuffle, 
                              collate_fn=batch_preprocessing,
-                             num_worker=num_worker)
+                             num_workers=configs.num_worker)
 
     val_loader = DataLoader(dataset=val_dataset, 
                            batch_size=configs.batch_size,
                            shuffle=False, 
                            collate_fn=batch_preprocessing,
-                           num_worker=num_worker)
+                           num_workers=configs.num_worker)
     
     return train_loader, val_loader
 
